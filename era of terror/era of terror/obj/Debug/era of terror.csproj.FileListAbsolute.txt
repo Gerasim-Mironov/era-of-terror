@@ -1,0 +1,7 @@
+C:\Users\antol\cs\azure\era of terror\era of terror\era of terror\bin\Debug\era of terror.exe.config
+C:\Users\antol\cs\azure\era of terror\era of terror\era of terror\bin\Debug\era of terror.exe
+C:\Users\antol\cs\azure\era of terror\era of terror\era of terror\bin\Debug\era of terror.pdb
+C:\Users\antol\cs\azure\era of terror\era of terror\era of terror\obj\Debug\era of terror.csprojAssemblyReference.cache
+C:\Users\antol\cs\azure\era of terror\era of terror\era of terror\obj\Debug\era of terror.csproj.CoreCompileInputs.cache
+C:\Users\antol\cs\azure\era of terror\era of terror\era of terror\obj\Debug\era of terror.exe
+C:\Users\antol\cs\azure\era of terror\era of terror\era of terror\obj\Debug\era of terror.pdb
