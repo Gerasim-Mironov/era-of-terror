@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,10 +11,9 @@ namespace era_of_terror
     {
         static void Main(string[] args)
         {
-            const string toKill = "E:\\PICTURE";
-            explorer mtd = new explorer();
-            
-            mtd.deleteFolder(toKill);
+            DirectoryInfo mtd = new DirectoryInfo("D:\\");
+            explorer ex = new explorer();
+            ex.treeLang(mtd);
 
             Console.ReadLine();
         }
