@@ -13,21 +13,34 @@ namespace era_of_terror
         {
 
         }
-        public void treeLang(DirectoryInfo mtd)
+        public static string[] fetchDirectories(DirectoryInfo mtd)
         {
-            string direction = mtd.FullName;
-            if(mtd.Exists)
+            string[] ask = Directory.GetDirectories(mtd.FullName);
+            return ask;
+        }
+        public void tree(string[] ask)
+        {
+            foreach(string item in ask)
             {
-                foreach(DirectoryInfo item in mtd.EnumerateDirectories())
+                bool mane = false;
+                char mz = '\\';
+                int sl = 0;
+                for (int i = item.Length - 1; i > 0; i--)
                 {
-                    Console.WriteLine(item.Name);
-                    foreach(DirectoryInfo obj in item.EnumerateDirectories())
+                    if (item[i] == mz)
                     {
-                        Console.WriteLine("|____" + obj.Name);
+                        sl = i;
+                        string mis = item.Remove(0, sl + 1);
+                        Console.WriteLine(mis);
+                        mane = true;
+
+                        break;
                     }
                 }
+
+                if (mane == false)
+                    Console.WriteLine(item);
             }
-            
         }
 
         public bool deleteFolder(string toKill)

@@ -11,10 +11,15 @@ namespace era_of_terror
     {
         static void Main(string[] args)
         {
-            DirectoryInfo mtd = new DirectoryInfo("D:\\");
             explorer ex = new explorer();
-            ex.treeLang(mtd);
 
+            DirectoryInfo mtd = new DirectoryInfo("D:\\");
+            string[] ask = explorer.fetchDirectories(mtd);
+            //ex.tree(ask);
+            graphicMenu.VerticalMenu(ask);
+
+            
+            
             Console.ReadLine();
         }
     }
