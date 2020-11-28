@@ -9,20 +9,32 @@ namespace era_of_terror
 {
     class explorer
     {
+        private static string currentLocation;
+        public string[] shortenedRoutes { get; set; }
+        public List<DirectoryInfo> fullRoutes { get; set; }
         public explorer()
         {
+            currentLocation = "";
+            shortenedRoutes = new string[] { };
+            fullRoutes = new List<DirectoryInfo> { };
+        }
+        public static string[] fetchDirectories(DirectoryInfo mtd, List<DirectoryInfo> storage)
+        {
+            currentLocation = mtd.FullName;
 
-        }
-        public static string[] fetchDirectories(DirectoryInfo mtd)
-        {
             string[] ask = Directory.GetDirectories(mtd.FullName);
-            return ask;
-        }
-        public void tree(string[] ask)
-        {
             foreach(string item in ask)
             {
-                bool mane = false;
+                DirectoryInfo temp = new DirectoryInfo(item);
+                storage.Add(temp);
+            }
+            return ask;
+        }
+        public string[] prepareTheTree(string[] ask)
+        {
+            List<string> vh = new List<string> { };
+            foreach(string item in ask)
+            {
                 char mz = '\\';
                 int sl = 0;
                 for (int i = item.Length - 1; i > 0; i--)
@@ -31,16 +43,15 @@ namespace era_of_terror
                     {
                         sl = i;
                         string mis = item.Remove(0, sl + 1);
-                        Console.WriteLine(mis);
-                        mane = true;
+                        vh.Add(mis);
 
                         break;
                     }
                 }
-
-                if (mane == false)
-                    Console.WriteLine(item);
             }
+
+            string[]langley = vh.ToArray();
+            return langley;
         }
 
         public bool deleteFolder(string toKill)
@@ -103,7 +114,9 @@ namespace era_of_terror
                 {
 
                     case ConsoleKey.Enter:
-                        return pos;
+                        {
+                            return pos;
+                        }
                         break;
 
                     case ConsoleKey.Escape:

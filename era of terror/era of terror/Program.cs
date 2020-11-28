@@ -11,16 +11,27 @@ namespace era_of_terror
     {
         static void Main(string[] args)
         {
+            #region settings
+            Console.BackgroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Red;
+            #endregion
             explorer ex = new explorer();
 
-            DirectoryInfo mtd = new DirectoryInfo("D:\\");
-            string[] ask = explorer.fetchDirectories(mtd);
-            //ex.tree(ask);
-            graphicMenu.VerticalMenu(ask);
+            DirectoryInfo mtd = new DirectoryInfo("C:\\");
+            ex.shortenedRoutes = explorer.fetchDirectories(mtd, ex.fullRoutes);
+            
+            while(true)
+            {
+                Console.Clear();
+                int demand = graphicMenu.VerticalMenu(ex.prepareTheTree(ex.shortenedRoutes));
 
-            
-            
-            Console.ReadLine();
+                Console.Clear();
+
+                DirectoryInfo mt = ex.fullRoutes[demand];
+                ex.shortenedRoutes = explorer.fetchDirectories(mt, ex.fullRoutes);//тут ошибка где- то
+
+                //graphicMenu.VerticalMenu(ex.prepareTheTree(ex.shortenedRoutes));
+            }
         }
     }
 }
