@@ -5,21 +5,31 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Windows;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace era_of_terror
 {
+
+
     class explorer
-    { 
-        public int moveNum = -1;
+    {
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, int cmdShow);
+        public bool fullscreen = false;
+
+
         public string moveString { get; set; }
         public static List<DriveInfo> AllDrives = DriveInfo.GetDrives().ToList();
 
-        public static string currentLocation = "";
+        public string currentLocation = "";
         public string[] shortenedRoutes { get; set; }
         public List<DirectoryInfo> fullRoutes { get; set; }
 
         public string[] shortenedFileRoutes { get; set; }
         public List<FileInfo> fullFileRoutes { get; set; }
+
+        public bool copy = false;
 
         //public List<>
         public explorer()
@@ -34,7 +44,7 @@ namespace era_of_terror
 
 
 
-        public static string[] fetchDirectories(DirectoryInfo mtd)
+        public string[] fetchDirectories(DirectoryInfo mtd)
         {
             currentLocation = mtd.FullName;
 
@@ -115,51 +125,75 @@ namespace era_of_terror
         }
 
 
-        public bool deleteFolder(string toKill)
+        public bool delete(DirectoryInfo toKill)
         {
             try
             {
-                DirectoryInfo dv = new DirectoryInfo(toKill);
-                dv.Delete(true);
-                Console.WriteLine("оно умерщвлено");
+                toKill.Delete(true);
                 return true;
             }
-            catch (Exception exc)
+            catch (Exception e)
             {
-                Console.WriteLine(exc.Message);
+                MessageBox.Show($"{e.Message}", "an exception has occured");
+                return false;
+            }
+        }
+        public bool delete(FileInfo toKill)
+        {
+            try
+            {
+                toKill.Delete();
+                return true;
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show($"{e.Message}", "an exception has occured");
                 return false;
             }
         }
 
-        public bool rename(DirectoryInfo mt, string sati)
+        public bool moveTo(DirectoryInfo mt, string sati)
         {
             try
             {
                 Directory.Move(mt.FullName, sati);
+                this.moveString = "";
                 return true;
             }
             catch (Exception e)
             {
                 MessageBox.Show($"{e.Message}", "an exception has occured");
+                this.moveString = "";
                 return false;
             }
         }
-        public bool rename(FileInfo mt, string sati)
+        public bool moveTo(FileInfo mt, string sati)
         {
             try
             {
                 File.Move(mt.FullName, sati);
+                this.moveString = "";
                 return true;
             }
             catch (Exception e)
             {
                 MessageBox.Show($"{e.Message}", "an exception has occured");
+                this.moveString = "";
                 return false;
             }
-
+            
         }
 
+        public DirectoryInfo createFolder(string name)
+        {
+            return Directory.CreateDirectory(name);
         }
+        public FileStream createFile(string name)
+        {
+            return File.Create(name); 
+        }
+
+    }
         #region gololobov
         class graphicMenu
         {
@@ -212,7 +246,7 @@ namespace era_of_terror
                             return -9;
                             break;
 
-                        case ConsoleKey.UpArrow:
+                    case ConsoleKey.UpArrow:
                             if (pos > 0)
                                 pos--;
                             break;
@@ -283,38 +317,103 @@ namespace era_of_terror
                             Console.Clear();
                             try
                             {
-                                Console.WriteLine(explorer.currentLocation + $"\n{ex.shortenedRoutes[pos]} ->");
-                                string newName = explorer.currentLocation + "\\" + Console.ReadLine();
-                                ex.rename(ex.fullRoutes[pos], newName);
+                                Console.WriteLine(ex.currentLocation + $"\n{ex.shortenedRoutes[pos]} ->");
+                                string newName = ex.currentLocation + "\\" + Console.ReadLine();
+                                ex.moveTo(ex.fullRoutes[pos], newName);
                             }
                             catch(IndexOutOfRangeException)
                             {
-                                Console.WriteLine(explorer.currentLocation + $"\n{ex.shortenedFileRoutes[pos - ex.fullRoutes.Count]} -> ");
-                                string newName = explorer.currentLocation + "\\" + Console.ReadLine();
-                                ex.rename(ex.fullFileRoutes[pos - ex.fullRoutes.Count], newName);
+                                Console.WriteLine(ex.currentLocation + $"\n{ex.shortenedFileRoutes[pos - ex.fullRoutes.Count]} -> ");
+                                string newName = ex.currentLocation + "\\" + Console.ReadLine();
+                                ex.moveTo(ex.fullFileRoutes[pos - ex.fullRoutes.Count], newName);
                             }
 
                             return -13;
                         }
                         break;
-
+                    
                     case ConsoleKey.C:
                         {
-                            ex.moveNum = pos;
-                            return pos;
+                            try
+                            {
+                                ex.moveString = ex.shortenedRoutes[pos];
+                            }
+                            catch (IndexOutOfRangeException)
+                            {
+                                ex.moveString = ex.shortenedFileRoutes[pos];
+                            }
+                            ex.copy = true;
                         }
                         break;
 
                     case ConsoleKey.X:
                         {
-                            ex.moveNum = pos;
-                            return pos;
+                            try
+                            {
+                                ex.moveString = ex.shortenedRoutes[pos];
+                            }
+                            catch (IndexOutOfRangeException)
+                            {
+                                ex.moveString = ex.shortenedFileRoutes[pos];
+                            }
+                            ex.copy = false;
                         }
                         break;
 
                     case ConsoleKey.V:
-                        {
+                        return -25;
+                        break;
 
+                    case ConsoleKey.Delete:
+                        {
+                            try
+                            {
+                                DirectoryInfo temple = new DirectoryInfo(ex.shortenedRoutes[pos]);
+                                ex.delete(temple);
+                            }
+                            catch(IndexOutOfRangeException)
+                            {
+                                FileInfo temple = new FileInfo(ex.shortenedFileRoutes[pos - ex.shortenedRoutes.Length]);
+                                ex.delete(temple);
+                            }
+                            return -13;
+                        }
+                        break;
+
+                    case ConsoleKey.F:
+                        {
+                            if (ex.fullscreen == false)
+                            {
+                                Process ask = Process.GetCurrentProcess();
+                                explorer.ShowWindow(ask.MainWindowHandle, 3);
+                                ex.fullscreen = true;
+                            }
+                            else
+                            {
+                                Process ask = Process.GetCurrentProcess();
+                                explorer.ShowWindow(ask.MainWindowHandle, 9);
+                                ex.fullscreen = false;
+                            }
+                        }
+                        break;
+
+                    case ConsoleKey.A:
+                        {
+                            Console.Clear();
+                            Console.WriteLine(ex.currentLocation + "\n");
+                            string sati = Console.ReadLine();
+                            ex.createFolder(ex.currentLocation + "\\" + sati);
+                            return -13;
+                        }
+                        break;
+
+                    case ConsoleKey.S:
+                        {
+                            Console.Clear();
+                            Console.WriteLine(ex.currentLocation + "\n");
+                            string sati = Console.ReadLine();
+                            ex.createFile(ex.currentLocation + "\\" + sati);
+                            return -13;
                         }
 
                     case ConsoleKey.UpArrow:

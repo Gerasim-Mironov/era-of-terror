@@ -14,8 +14,30 @@ namespace era_of_terror
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("instructions:\n\ne- switching drives\nr- rename\ndel- delete something\nenter- move on\nnavigate with arrows\n");
-            Console.ReadKey();
+            string gerc;
+            using (StreamReader sr = new StreamReader("staticSettings.txt"))
+            {
+                gerc = sr.ReadToEnd();
+            }
+            if (gerc == "true")
+            {
+                Console.WriteLine("instructions:\n\ne- switching drives\nr- rename\nc- copy\nx- cut out\nv- insert//copy\nf- fullscreen on//off\na- create new folder\ns- create new file\ndel- delete something\nenter- move on\nnavigate with arrows\n(press 1 to never witness this again)");
+                char choice = Console.ReadKey().KeyChar;
+                switch (choice)
+                {
+                    case '1':
+                        {
+                            using (StreamWriter sw = new StreamWriter("staticSettings.txt", false))
+                            {
+                                sw.Write("false");
+                            }
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
 
             #region settings
             Console.BackgroundColor = ConsoleColor.White;
@@ -33,15 +55,15 @@ namespace era_of_terror
 
             while(true)
             {
-                antique.Add(explorer.currentLocation);
+                antique.Add(ex.currentLocation);
 
                 ex.shortenedFileRoutes = explorer.haulFiles(mtd);
-                ex.shortenedRoutes = explorer.fetchDirectories(mtd);
+                ex.shortenedRoutes = ex.fetchDirectories(mtd);
                 ex.fullRoutes = explorer.convertStrings(ex.shortenedRoutes);
                 ex.fullFileRoutes = explorer.convertLines(ex.shortenedFileRoutes);
 
                 Console.Clear();
-                Console.WriteLine(explorer.currentLocation + "\n");
+                Console.WriteLine(ex.currentLocation + "\n");
 
                 List<string> rits = new List<string> { };
                 rits.AddRange(ex.prepareTheTree(ex.shortenedRoutes));
@@ -52,9 +74,44 @@ namespace era_of_terror
 
                 Console.Clear();
 
-                if (demand == -13)
+                if (demand == -25)
                 {
-                    
+                    if (ex.moveString != "")
+                    {
+                        if (ex.copy == false)
+                        {
+                            try
+                            {
+                                DirectoryInfo info = new DirectoryInfo(ex.moveString);
+                                ex.moveTo(info, ex.currentLocation + "\\" + info.Name);
+                            }
+                            catch (Exception)
+                            {
+                                FileInfo info = new FileInfo(ex.moveString);
+                                ex.moveTo(info, ex.currentLocation + "\\" + info.Name);
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                FileInfo ul = new FileInfo(ex.moveString);
+                                File.Copy(ul.FullName, ex.currentLocation);
+                            }
+                            catch(Exception)
+                            {
+                                //тупые директории
+                            }
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("nothing to copy", "an exception has occured");
+                    }
+                }
+                else if (demand == -13)
+                {
+
                 }
                 else if (demand == -9)
                 {
@@ -93,9 +150,16 @@ namespace era_of_terror
                 }
                 else
                 {
-                    DirectoryInfo temporary = new DirectoryInfo(antique[antique.Count - returnCount]);
-                    mtd = temporary;
-                    returnCount += 2;
+                    try
+                    {
+                        DirectoryInfo temporary = new DirectoryInfo(antique[antique.Count - returnCount]);
+                        mtd = temporary;
+                        returnCount += 2;
+                    }
+                    catch(Exception)
+                    {
+                        Environment.Exit(0);
+                    }
                 }
             }
         }
